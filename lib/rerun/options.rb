@@ -73,6 +73,9 @@ module Rerun
           options[:force_polling] = true
         end
 
+        opts.on("--listen-on host", "listen on a host for forwarded file events instead of the filesystem") do |host|
+          options[:listen_on_host] = host
+        end
 
         opts.on_tail("-h", "--help", "--usage", "show this message") do
           puts opts

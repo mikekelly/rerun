@@ -40,6 +40,7 @@ module Rerun
       @directories = sanitize_dirs(@directories)
       @priority = options[:priority]
       @force_polling = options[:force_polling]
+      @listen_on_host = options[:listen_on_host]
       @ignore = [options[:ignore]].flatten.compact
       @thread = nil
     end
@@ -61,10 +62,10 @@ module Rerun
       end
 
       @thread = Thread.new do
-        @listener = Listen.to(*@directories, only: watching, ignore: ignoring, wait_for_delay: 1, force_polling: @force_polling) do |modified, added, removed|
-          if((modified.size + added.size + removed.size) > 0)
-            @client_callback.call(:modified => modified, :added => added, :removed => removed)
-          end
+        @listener = if @listen_on_host.nil?
+          Listen.to(*@directories, only: watching, ignore: ignoring, wait_for_delay: 1, force_polling: @force_polling, &method(:handle_filesystem_event))
+        else
+          Listen.on(@listen_on_host, only: watching, ignore: ignoring, &method(:handle_filesystem_event))
         end
         @listener.start
       end
@@ -123,5 +124,12 @@ module Rerun
       @listener && @listener.instance_variable_get(:@adapter)
     end
 
+    private
+
+    def handle_filesystem_event(modified, added, removed)
+      if((modified.size + added.size + removed.size) > 0)
+        @client_callback.call(:modified => modified, :added => added, :removed => removed)
+      end
+    end
   end
 end
