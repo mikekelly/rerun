@@ -117,6 +117,10 @@ module Rerun
       @options[:force_polling]
     end
 
+    def listen_on_port
+      @options[:listen_on_port]
+    end
+
     def start
       if windows?
         raise "Sorry, Rerun does not work on Windows."
@@ -183,7 +187,7 @@ module Rerun
 
       unless @watcher
 
-        watcher = Watcher.new(:directory => dirs, :pattern => pattern, :ignore => ignore, :force_polling => force_polling) do |changes|
+        watcher = Watcher.new(:directory => dirs, :pattern => pattern, :ignore => ignore, :force_polling => force_polling, :listen_on_port => listen_on_port) do |changes|
 
           message = change_message(changes)
 

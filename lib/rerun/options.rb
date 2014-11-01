@@ -73,6 +73,9 @@ module Rerun
           options[:force_polling] = true
         end
 
+        opts.on("--listen-on-port port", "listen on a port for forwarded file events instead of filesystem") do |port|
+          options[:listen_on_port] = port.to_i
+        end
 
         opts.on_tail("-h", "--help", "--usage", "show this message") do
           puts opts
