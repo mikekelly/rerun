@@ -75,6 +75,8 @@ module Rerun
       sleep 0.1 until @listener
 
       at_exit { stop } # try really hard to clean up after ourselves
+    rescue Errno::ETIMEDOUT
+      STDERR.puts "ERROR: Connecting to listen server timed out"
     end
 
     def watching
