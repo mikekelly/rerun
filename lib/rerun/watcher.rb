@@ -67,7 +67,11 @@ module Rerun
         else
           Listen.on(@listen_on_host, only: watching, ignore: ignoring, &method(:handle_filesystem_event))
         end
-        @listener.start
+        begin
+          @listener.start
+        rescue Errno::ETIMEDOUT
+          STDERR.puts "ERROR: Connecting to listen server timed out"
+        end
       end
 
       @thread.priority = @priority
