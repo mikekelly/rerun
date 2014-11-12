@@ -62,15 +62,15 @@ module Rerun
       end
 
       @thread = Thread.new do
-        @listener = if @listen_on_host.nil?
-          Listen.to(*@directories, only: watching, ignore: ignoring, wait_for_delay: 1, force_polling: @force_polling, &method(:handle_filesystem_event))
-        else
-          Listen.on(@listen_on_host, only: watching, ignore: ignoring, &method(:handle_filesystem_event))
-        end
         begin
+          @listener = if @listen_on_host.nil?
+            Listen.to(*@directories, only: watching, ignore: ignoring, wait_for_delay: 1, force_polling: @force_polling, &method(:handle_filesystem_event))
+          else
+            Listen.on(@listen_on_host, only: watching, ignore: ignoring, &method(:handle_filesystem_event))
+          end
           @listener.start
-        rescue Errno::ETIMEDOUT
-          STDERR.puts "ERROR: Connecting to listen server timed out"
+        rescue Exception => e
+          STDERR.puts "ERROR: Connecting to listen server exception: #{e.message} at #{e.backtrace.join("\n")}"
         end
       end
 
